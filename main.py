@@ -14,7 +14,9 @@ import zlib
 
 # Load the CLIP model
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model, preprocess = torch.hub.load('openai/clip', 'clip400', device=device)
+#model, preprocess = torch.hub.load('openai/clip', 'clip400', device=device)
+model, preprocess = torch.hub.load('openai/clip', 'ViT-B/32', device=device)
+
 model.eval()
 
 print("test beginning 22")
