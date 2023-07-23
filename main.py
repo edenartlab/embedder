@@ -22,9 +22,12 @@ import clip
 from PIL import Image
 
 print("a3")
+print("a3a")
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
+print("a3b")
 model, preprocess = clip.load("ViT-B/32", device=device)
+print("a3c")
 
 print("a4")
 
