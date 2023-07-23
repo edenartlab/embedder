@@ -73,14 +73,13 @@ while True:
         image_features /= image_features.norm(dim=-1, keepdim=True)
         embedding = image_features.cpu().numpy()
         
-        print("embedding is here ", embedding)
         print("the shape is", embedding.shape)
         
         t3 = time.time()
 
         print("time to load image", t2-t1)
         print("time to embed image", t3-t2)
-        
+
         time.sleep(1)
 
 
