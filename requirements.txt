@@ -1,0 +1,9 @@
+torch
+torchvision
+numpy
+pillow
+pymongo
+requests
+tqdm
+ftfy
+regex
