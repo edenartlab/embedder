@@ -4,11 +4,12 @@ import requests
 from pymongo import MongoClient
 from PIL import Image
 from io import BytesIO
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 import torch
 #import clip
 
 
+print("test beginning")
 
 MONGO_URI = os.getenv('MONGO_URI')
 
