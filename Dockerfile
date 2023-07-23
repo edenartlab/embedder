@@ -4,7 +4,7 @@ WORKDIR /app
 
 ADD . /app
 
-RUN pip install --no-cache-dir torch numpy pillow pymongo requests
+RUN pip install --no-cache-dir torch torchvision numpy pillow pymongo requests
 
 EXPOSE 80
 
