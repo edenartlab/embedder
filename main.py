@@ -1,3 +1,4 @@
+print("a1")
 import time
 import os
 import requests
@@ -12,6 +13,7 @@ import numpy as np
 import zlib
 
 
+print("a2")
 
 
 
@@ -19,24 +21,30 @@ import torch
 import clip
 from PIL import Image
 
+print("a3")
+
 device = "cuda" if torch.cuda.is_available() else "cpu"
 model, preprocess = clip.load("ViT-B/32", device=device)
 
-
+print("a4")
 
 
 MONGO_URI = os.getenv('MONGO_URI')
 
+print("a5")
 print("MONOGP yay open now", MONGO_URI)
 
 client = MongoClient(MONGO_URI)
 db = client['eden-dev']
 collection = db['creations']
 
+print("a6")
 
 while True:
 
-    for document in collection.find(limit=25):
+    print("a7")
+
+    for document in collection.find(limit=50):
         print(document)
         
         
