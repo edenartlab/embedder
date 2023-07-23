@@ -48,17 +48,24 @@ while True:
     print("a7")
 
     for document in collection.find(limit=50):
+        t1 = time.time()
         print(document)
         
-        
         # Load and preprocess the image
-        image_path = document['uri']
+        image_url = document['uri']
         
         
-        image = Image.open(image_path).convert("RGB")
+        response = requests.get(image_url)
+        image = Image.open(BytesIO(response.content))
 
+        image = image.convert("RGB")
+
+        print("image size", image.size)
 
         image = preprocess(image).unsqueeze(0).to(device)
+
+
+        t2 = time.time()
 
         with torch.no_grad():
             image_features = model.encode_image(image)
@@ -68,6 +75,11 @@ while True:
         
         print("embedding is here ", embedding)
         print("the shape is", embedding.shape)
+        
+        t3 = time.time()
+
+        print("time to load image", t2-t1)
+        print("time to embed image", t3-t2)
         
         time.sleep(1)
 
