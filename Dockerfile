@@ -4,10 +4,12 @@ WORKDIR /app
 
 ADD . /app
 
-RUN apt-get update && apt-get install -y git build-essential
+RUN apt-get update && apt-get install -y git build-essential cmake
 
 RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 80
 
 CMD ["python", "main.py"]
+
+
