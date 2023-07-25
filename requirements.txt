@@ -8,6 +8,5 @@ tqdm
 ftfy
 regex
 python-dotenv
-pysqlite3-binary
 git+https://github.com/chroma-core/chroma.git
 git+https://github.com/openai/CLIP.git
