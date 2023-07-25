@@ -7,4 +7,6 @@ requests
 tqdm
 ftfy
 regex
+python-dotenv
+chromadb
 git+https://github.com/openai/CLIP.git
