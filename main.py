@@ -1,7 +1,7 @@
-__import__('pysqlite3')
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
-
+# __import__('sqlite3')
+# import sys
+# sys.modules['pysqlite3'] = sys.modules.pop('sqlite3')
+# import chromadb
 
 import time
 import os
@@ -20,9 +20,10 @@ load_dotenv()
 
 print("lets do chromadb")
 import chromadb
-chroma_client = chromadb.HttpClient(host="http://chromadb.mars", port=8000)
+chroma_client = chromadb.HttpClient(host="chromadb.mars", port=8000)
+#chroma_client = chromadb.HttpClient(host="chromadb.eden.art", port=8000)
 print(chroma_client)
-print("great")
+print("great 33")
 
 
 collection = chroma_client.create_collection(name="test1")

@@ -1,16 +1,13 @@
-FROM python:3.8-slim-buster
+FROM python:3.10-slim-bookworm as builder
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y git build-essential cmake unzip
-
 ADD . /app
 
-# Download and install the latest version of SQLite
-RUN apt-get install -y wget \
-    && wget https://www.sqlite.org/2023/sqlite-dll-win64-x64-3420000.zip \
-    && unzip sqlite-dll-win64-x64-3420000.zip \
-    && cp sqlite3.dll /usr/local/bin
+RUN apt-get update --fix-missing 
+
+RUN apt-get install -y --fix-missing \
+    git build-essential cmake
 
 RUN pip install --no-cache-dir -r requirements.txt
 

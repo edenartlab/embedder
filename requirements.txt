@@ -8,5 +8,6 @@ tqdm
 ftfy
 regex
 python-dotenv
-git+https://github.com/chroma-core/chroma.git
+chromadb-client
+pydantic==1.9.0
 git+https://github.com/openai/CLIP.git
