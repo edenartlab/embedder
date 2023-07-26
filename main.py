@@ -3,7 +3,7 @@ import time
 print("begin this process")
 
 
-print("lets do chromadb")
+print("lets do chromadb!")
 import chromadb
 chroma_client = chromadb.HttpClient(host="chromadb.mars", port=8000)
 print("great")
@@ -38,14 +38,14 @@ print("yay")
 
 
 docs = [
-    {"doc": "cat.", "metadata": {"tag": "animal"}, "id": "idb1", "embedding": [1.25, -0.5, 2.9] },
-    {"doc": "dog.", "metadata": {"tag": "animal"}, "id": "idb2", "embedding": [1.05, -0.6, 2.7]},
-    {"doc": "pig.", "metadata": {"tag": "animal"}, "id": "idb3", "embedding": [1.45, -0.4, 3.1]},
-    {"doc": "blue.", "metadata": {"tag": "color"}, "id": "idb4", "embedding": [-1.25, 2.5, 1.8]},
-    {"doc": "red.", "metadata": {"tag": "color"}, "id": "idb5", "embedding": [-1.35, 2.4, 1.9]},
-    {"doc": "green.", "metadata": {"tag": "color"}, "id": "idb6", "embedding": [-1.26, 2.2, 1.6]},
-    {"doc": "France.", "metadata": {"tag": "country"}, "id": "idb7", "embedding": [0.25, 1.5, -2.0]},
-    {"doc": "Germany.", "metadata": {"tag": "country"}, "id": "idb8", "embedding": [0.35, 1.4, -2.1]},    
+    {"doc": "cat.", "metadata": {"tag": "animal"}, "id": "idc1", "embedding": [1.251, -0.5, 2.9] },
+    {"doc": "dog.", "metadata": {"tag": "animal"}, "id": "idc2", "embedding": [1.051, -0.6, 2.7]},
+    {"doc": "pig.", "metadata": {"tag": "animal"}, "id": "idc3", "embedding": [1.451, -0.4, 3.1]},
+    {"doc": "blue.", "metadata": {"tag": "color"}, "id": "idc4", "embedding": [-1.251, 2.5, 1.8]},
+    {"doc": "red.", "metadata": {"tag": "color"}, "id": "idc5", "embedding": [-1.351, 2.4, 1.9]},
+    {"doc": "green.", "metadata": {"tag": "color"}, "id": "idc6", "embedding": [-1.261, 2.2, 1.6]},
+    {"doc": "France.", "metadata": {"tag": "country"}, "id": "idc7", "embedding": [0.251, 1.5, -2.0]},
+    {"doc": "Germany.", "metadata": {"tag": "country"}, "id": "idc8", "embedding": [0.351, 1.4, -2.1]},    
 ]
 
 print("lets add")
@@ -83,8 +83,8 @@ print(docs3)
 print("query")
 
 results = collection.query(
-    query_embeddings=[[1.11, -0.72, 2.4]],
-    n_results=3
+    query_embeddings=[[1.113, -0.72, 2.4]],
+    n_results=12
 )
 
 print(results)
