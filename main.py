@@ -20,6 +20,7 @@ load_dotenv()
 
 print("lets do chromadb 55")
 import chromadb
+#chroma_client = chromadb.Client()
 chroma_client = chromadb.HttpClient(host="chromadb.mars", port=8000)
 #chroma_client = chromadb.HttpClient(host="chromadb.eden.art", port=8000)
 print(chroma_client)
