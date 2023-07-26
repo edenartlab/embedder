@@ -3,6 +3,29 @@ import time
 print("begin this process")
 
 
+print("lets do chromadb 5 345345 5")
+import chromadb
+chroma_client = chromadb.HttpClient(host="chromadb.mars", port=8000)
+print("great")
+print(chroma_client)
+
+
+collection = chroma_client.get_or_create_collection(name="test4")
+print(collection)
+
+print("get documents")
+docs2 = collection.get(
+    include=["documents"]
+)
+
+print(docs2)
+
+print("yay")
+
+# #collection = chroma_client.get_collection(name="test4")
+
+
+
 while True:
     print("sleep")
     time.sleep(5)
@@ -10,10 +33,6 @@ while True:
 print("this is finished")
     
 
-# # __import__('sqlite3')
-# # import sys
-# # sys.modules['pysqlite3'] = sys.modules.pop('sqlite3')
-# # import chromadb
 
 # import time
 # import os
