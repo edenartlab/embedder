@@ -1,5 +1,19 @@
-print("main")
+print("main 2")
+
 import time
+import os
+import requests
+from pymongo import MongoClient
+from PIL import Image
+from io import BytesIO
+#import numpy as np
+import torch
+import clip
+#dotenv
+
+#from dotenv import load_dotenv
+#load_dotenv()
+
 print("begin this process")
 
 
@@ -16,7 +30,7 @@ print("---all collections done----")
 collection = chroma_client.get_or_create_collection(name="test4")
 print(collection)
 
-print("stats")
+print("stats :)")
 print(collection.count())
 
 print("peek")
@@ -38,29 +52,29 @@ print("yay")
 
 
 docs = [
-    {"doc": "cat.", "metadata": {"tag": "animal"}, "id": "idc1", "embedding": [1.251, -0.5, 2.9] },
-    {"doc": "dog.", "metadata": {"tag": "animal"}, "id": "idc2", "embedding": [1.051, -0.6, 2.7]},
-    {"doc": "pig.", "metadata": {"tag": "animal"}, "id": "idc3", "embedding": [1.451, -0.4, 3.1]},
-    {"doc": "blue.", "metadata": {"tag": "color"}, "id": "idc4", "embedding": [-1.251, 2.5, 1.8]},
-    {"doc": "red.", "metadata": {"tag": "color"}, "id": "idc5", "embedding": [-1.351, 2.4, 1.9]},
-    {"doc": "green.", "metadata": {"tag": "color"}, "id": "idc6", "embedding": [-1.261, 2.2, 1.6]},
-    {"doc": "France.", "metadata": {"tag": "country"}, "id": "idc7", "embedding": [0.251, 1.5, -2.0]},
-    {"doc": "Germany.", "metadata": {"tag": "country"}, "id": "idc8", "embedding": [0.351, 1.4, -2.1]},    
+    {"doc": "cat.", "metadata": {"tag": "animal"}, "id": "idd1", "embedding": [1.2512, -0.5, 2.9] },
+    {"doc": "dog.", "metadata": {"tag": "animal"}, "id": "idd2", "embedding": [1.0512, -0.6, 2.7]},
+    {"doc": "pig.", "metadata": {"tag": "animal"}, "id": "idd3", "embedding": [1.4512, -0.4, 3.1]},
+    {"doc": "blue.", "metadata": {"tag": "color"}, "id": "idd4", "embedding": [-1.2512, 2.5, 1.8]},
+    {"doc": "red.", "metadata": {"tag": "color"}, "id": "idd5", "embedding": [-1.3512, 2.4, 1.9]},
+    {"doc": "green.", "metadata": {"tag": "color"}, "id": "idd6", "embedding": [-1.2612, 2.2, 1.6]},
+    {"doc": "France.", "metadata": {"tag": "country"}, "id": "idd7", "embedding": [0.2512, 1.5, -2.0]},
+    {"doc": "Germany.", "metadata": {"tag": "country"}, "id": "idd8", "embedding": [0.3512, 1.4, -2.1]},    
 ]
 
-print("lets add")
-print([doc['doc'] for doc in docs])
-print([doc['metadata'] for doc in docs])
-print([doc['id'] for doc in docs])
+# print("lets add")
+# print([doc['doc'] for doc in docs])
+# print([doc['metadata'] for doc in docs])
+# print([doc['id'] for doc in docs])
 
-collection.add(
-    documents=[doc['doc'] for doc in docs],
-    embeddings=[doc['embedding'] for doc in docs],
-    metadatas=[doc['metadata'] for doc in docs],
-    ids=[doc['id'] for doc in docs]
-)
+# collection.add(
+#     documents=[doc['doc'] for doc in docs],
+#     embeddings=[doc['embedding'] for doc in docs],
+#     metadatas=[doc['metadata'] for doc in docs],
+#     ids=[doc['id'] for doc in docs]
+# )
 
-print("done adding, check again")
+#print("done adding, check again")
 
 
 print("stats")
@@ -94,9 +108,50 @@ print(results)
 
 print("now the rest....")
 
-# #collection = chroma_client.get_collection(name="test4")
 
 
+
+
+MONGO_URI = os.getenv('MONGO_URI')
+
+print("CONNECT", MONGO_URI)
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
+model, preprocess = clip.load("ViT-B/32", device=device)
+
+client = MongoClient(MONGO_URI)
+db = client['eden-dev']
+collection = db['creations']
+
+
+print("-----------------------")
+
+if True:
+
+    for document in collection.find(limit=10):
+        print("new doc")
+        try:
+            print(document)
+            
+            response = requests.get(document['uri'])
+            image = Image.open(BytesIO(response.content)).convert("RGB")
+            image = preprocess(image).unsqueeze(0).to(device)
+
+            with torch.no_grad():
+                image_features = model.encode_image(image)
+            image_features /= image_features.norm(dim=-1, keepdim=True)
+            embedding = image_features.cpu().numpy()
+
+            print(document['_id'], document['uri'], embedding.shape)
+
+        except Exception as e:
+            print("ERROR", e)
+            continue
+        
+    print("sleep")
+    time.sleep(5)
+
+print("-----------------------")
 
 while True:
     print("sleep")
@@ -106,18 +161,6 @@ print("this is finished")
     
 
 
-# import time
-# import os
-# import requests
-# from pymongo import MongoClient
-# from PIL import Image
-# from io import BytesIO
-# import numpy as np
-# import torch
-# import clip
-# #dotenv
-# from dotenv import load_dotenv
-# load_dotenv()
 
 
 
