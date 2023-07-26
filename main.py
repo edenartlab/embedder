@@ -18,15 +18,20 @@ load_dotenv()
 
 
 
-print("lets do chromadb")
+print("lets do chromadb 55")
 import chromadb
 chroma_client = chromadb.HttpClient(host="chromadb.mars", port=8000)
 #chroma_client = chromadb.HttpClient(host="chromadb.eden.art", port=8000)
 print(chroma_client)
-print("great 33")
+print("great 33 98u2")
 
 
-collection = chroma_client.get_or_create_collection(name="test2a")
+print("hello 1")
+
+collection = chroma_client.get_or_create_collection(name="test3a")
+
+print(collection)
+print("hello 2")
 # collection = chroma_client.get_collection(name="test1")
 
 
@@ -41,12 +46,21 @@ docs = [
     {"doc": "Germany", "metadata": {"tag": "country"}, "id": "id8"},    
 ]
 
+print("lets add")
+print(collection)
+print("hello 3")
 
 collection.add(
     documents=[doc['doc'] for doc in docs],
     metadatas=[doc['metadata'] for doc in docs],
     ids=[doc['id'] for doc in docs]
 )
+
+print("hello 3")
+print([doc['doc'] for doc in docs])
+print([doc['metadata'] for doc in docs])
+print([doc['id'] for doc in docs])
+print(collection)
 
 results = collection.query(
     query_texts=["Brazil"],
