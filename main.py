@@ -48,16 +48,16 @@ docs = [
     {"doc": "Germany", "metadata": {"tag": "country"}, "id": "id8", "embedding": [0.3, 1.4, -2.1]},    
 ]
 
-print("lets add")
-print(collection)
-print("hello 3")
+# print("lets add")
+# print(collection)
+# print("hello 3")
 
-collection.add(
-    documents=[doc['doc'] for doc in docs],
-    embeddings=[doc['embedding'] for doc in docs],
-    metadatas=[doc['metadata'] for doc in docs],
-    ids=[doc['id'] for doc in docs]
-)
+# collection.add(
+#     documents=[doc['doc'] for doc in docs],
+#     embeddings=[doc['embedding'] for doc in docs],
+#     metadatas=[doc['metadata'] for doc in docs],
+#     ids=[doc['id'] for doc in docs]
+# )
 
 print("hello 3")
 # print([doc['doc'] for doc in docs])
@@ -108,26 +108,26 @@ knn
 
 while True:
 
-    for document in collection.find(limit=3):
-        print("new doc")
-        try:
-            print(document)
+    # for document in collection.find(limit=3):
+    #     print("new doc")
+    #     try:
+    #         print(document)
             
-            response = requests.get(document['uri'])
-            image = Image.open(BytesIO(response.content)).convert("RGB")
-            image = preprocess(image).unsqueeze(0).to(device)
+    #         response = requests.get(document['uri'])
+    #         image = Image.open(BytesIO(response.content)).convert("RGB")
+    #         image = preprocess(image).unsqueeze(0).to(device)
 
-            with torch.no_grad():
-                image_features = model.encode_image(image)
-            image_features /= image_features.norm(dim=-1, keepdim=True)
-            embedding = image_features.cpu().numpy()
+    #         with torch.no_grad():
+    #             image_features = model.encode_image(image)
+    #         image_features /= image_features.norm(dim=-1, keepdim=True)
+    #         embedding = image_features.cpu().numpy()
 
-            print(document['_id'], document['uri'], embedding.shape)
+    #         print(document['_id'], document['uri'], embedding.shape)
 
-        except Exception as e:
-            print("ERROR", e)
-            continue
+    #     except Exception as e:
+    #         print("ERROR", e)
+    #         continue
         
-
+    print("sleep")
     time.sleep(5000)
     
