@@ -9,6 +9,9 @@ chroma_client = chromadb.HttpClient(host="chromadb.mars", port=8000)
 print("great")
 print(chroma_client)
 
+print("all collections!")
+print(chroma_client.list_collections())
+print("---all collections done----")
 
 collection = chroma_client.get_or_create_collection(name="test4")
 print(collection)
@@ -35,14 +38,14 @@ print("yay")
 
 
 docs = [
-    {"doc": "cat.", "metadata": {"tag": "animal"}, "id": "ida1", "embedding": [1.2, -0.5, 2.9] },
-    {"doc": "dog.", "metadata": {"tag": "animal"}, "id": "ida2", "embedding": [1.0, -0.6, 2.7]},
-    {"doc": "pig.", "metadata": {"tag": "animal"}, "id": "ida3", "embedding": [1.4, -0.4, 3.1]},
-    {"doc": "blue.", "metadata": {"tag": "color"}, "id": "ida4", "embedding": [-1.2, 2.5, 1.8]},
-    {"doc": "red.", "metadata": {"tag": "color"}, "id": "ida5", "embedding": [-1.3, 2.4, 1.9]},
-    {"doc": "green.", "metadata": {"tag": "color"}, "id": "ida6", "embedding": [-1.25, 2.2, 1.6]},
-    {"doc": "France.", "metadata": {"tag": "country"}, "id": "ida7", "embedding": [0.2, 1.5, -2.0]},
-    {"doc": "Germany.", "metadata": {"tag": "country"}, "id": "ida8", "embedding": [0.3, 1.4, -2.1]},    
+    {"doc": "cat.", "metadata": {"tag": "animal"}, "id": "idb1", "embedding": [1.25, -0.5, 2.9] },
+    {"doc": "dog.", "metadata": {"tag": "animal"}, "id": "idb2", "embedding": [1.05, -0.6, 2.7]},
+    {"doc": "pig.", "metadata": {"tag": "animal"}, "id": "idb3", "embedding": [1.45, -0.4, 3.1]},
+    {"doc": "blue.", "metadata": {"tag": "color"}, "id": "idb4", "embedding": [-1.25, 2.5, 1.8]},
+    {"doc": "red.", "metadata": {"tag": "color"}, "id": "idb5", "embedding": [-1.35, 2.4, 1.9]},
+    {"doc": "green.", "metadata": {"tag": "color"}, "id": "idb6", "embedding": [-1.26, 2.2, 1.6]},
+    {"doc": "France.", "metadata": {"tag": "country"}, "id": "idb7", "embedding": [0.25, 1.5, -2.0]},
+    {"doc": "Germany.", "metadata": {"tag": "country"}, "id": "idb8", "embedding": [0.35, 1.4, -2.1]},    
 ]
 
 print("lets add")
