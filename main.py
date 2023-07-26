@@ -22,6 +22,19 @@ print(docs2)
 
 print("yay")
 
+
+results = collection.query(
+    query_embeddings=[[1.11, -0.72, 2.4]],
+    n_results=3
+)
+
+print(results)
+
+
+
+
+print("now the rest....")
+
 # #collection = chroma_client.get_collection(name="test4")
 
 
