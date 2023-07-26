@@ -37,14 +37,14 @@ print("hello 2")
 
 
 docs = [
-    {"doc": "cat", "metadata": {"tag": "animal"}, "id": "id1"},
-    {"doc": "dog", "metadata": {"tag": "animal"}, "id": "id2"},
-    {"doc": "pig", "metadata": {"tag": "animal"}, "id": "id3"},
-    {"doc": "blue", "metadata": {"tag": "color"}, "id": "id4"},
-    {"doc": "red", "metadata": {"tag": "color"}, "id": "id5"},
-    {"doc": "green", "metadata": {"tag": "color"}, "id": "id6"},
-    {"doc": "France", "metadata": {"tag": "country"}, "id": "id7"},
-    {"doc": "Germany", "metadata": {"tag": "country"}, "id": "id8"},    
+    {"doc": "cat", "metadata": {"tag": "animal"}, "id": "id1", "embedding": [1.2, -0.5, 2.9] },
+    {"doc": "dog", "metadata": {"tag": "animal"}, "id": "id2", "embedding": [1.0, -0.6, 2.7]},
+    {"doc": "pig", "metadata": {"tag": "animal"}, "id": "id3", "embedding": [1.4, -0.4, 3.1]},
+    {"doc": "blue", "metadata": {"tag": "color"}, "id": "id4", "embedding": [-1.2, 2.5, 1.8]},
+    {"doc": "red", "metadata": {"tag": "color"}, "id": "id5", "embedding": [-1.3, 2.4, 1.9]},
+    {"doc": "green", "metadata": {"tag": "color"}, "id": "id6", "embedding": [-1.25, 2.2, 1.6]},
+    {"doc": "France", "metadata": {"tag": "country"}, "id": "id7", "embedding": [0.2, 1.5, -2.0]},
+    {"doc": "Germany", "metadata": {"tag": "country"}, "id": "id8", "embedding": [0.3, 1.4, -2.1]},    
 ]
 
 print("lets add")
@@ -53,6 +53,7 @@ print("hello 3")
 
 collection.add(
     documents=[doc['doc'] for doc in docs],
+    embeddings=[doc['embedding'] for doc in docs],
     metadatas=[doc['metadata'] for doc in docs],
     ids=[doc['id'] for doc in docs]
 )
@@ -64,7 +65,7 @@ print([doc['id'] for doc in docs])
 print(collection)
 
 results = collection.query(
-    query_texts=["Brazil"],
+    query_embeddings=[[0.4, 1.1, -1.9]],
     n_results=3
 )
 
