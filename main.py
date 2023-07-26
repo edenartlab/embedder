@@ -26,8 +26,8 @@ print(chroma_client)
 print("great 33")
 
 
-collection = chroma_client.create_collection(name="test1")
-#collection = chroma_client.get_collection(name="test1")
+#collection = chroma_client.create_collection(name="test1")
+collection = chroma_client.get_collection(name="test1")
 
 
 docs = [
