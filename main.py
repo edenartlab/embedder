@@ -3,7 +3,7 @@ import time
 print("begin this process")
 
 
-print("lets do chromadb 5 345345 5")
+print("lets do chromadb")
 import chromadb
 chroma_client = chromadb.HttpClient(host="chromadb.mars", port=8000)
 print("great")
@@ -13,15 +13,71 @@ print(chroma_client)
 collection = chroma_client.get_or_create_collection(name="test4")
 print(collection)
 
+print("stats")
+print(collection.count())
+
+print("peek")
+print(collection.peek())
+
 print("get documents")
 docs2 = collection.get(
     include=["documents"]
 )
-
 print(docs2)
+
+print("get documents 2")
+docs3 = collection.get()
+print(docs3)
+
 
 print("yay")
 
+
+
+docs = [
+    {"doc": "cat.", "metadata": {"tag": "animal"}, "id": "ida1", "embedding": [1.2, -0.5, 2.9] },
+    {"doc": "dog.", "metadata": {"tag": "animal"}, "id": "ida2", "embedding": [1.0, -0.6, 2.7]},
+    {"doc": "pig.", "metadata": {"tag": "animal"}, "id": "ida3", "embedding": [1.4, -0.4, 3.1]},
+    {"doc": "blue.", "metadata": {"tag": "color"}, "id": "ida4", "embedding": [-1.2, 2.5, 1.8]},
+    {"doc": "red.", "metadata": {"tag": "color"}, "id": "ida5", "embedding": [-1.3, 2.4, 1.9]},
+    {"doc": "green.", "metadata": {"tag": "color"}, "id": "ida6", "embedding": [-1.25, 2.2, 1.6]},
+    {"doc": "France.", "metadata": {"tag": "country"}, "id": "ida7", "embedding": [0.2, 1.5, -2.0]},
+    {"doc": "Germany.", "metadata": {"tag": "country"}, "id": "ida8", "embedding": [0.3, 1.4, -2.1]},    
+]
+
+print("lets add")
+print([doc['doc'] for doc in docs])
+print([doc['metadata'] for doc in docs])
+print([doc['id'] for doc in docs])
+
+collection.add(
+    documents=[doc['doc'] for doc in docs],
+    embeddings=[doc['embedding'] for doc in docs],
+    metadatas=[doc['metadata'] for doc in docs],
+    ids=[doc['id'] for doc in docs]
+)
+
+print("done adding, check again")
+
+
+print("stats")
+print(collection.count())
+
+print("peek")
+print(collection.peek())
+
+print("get documents")
+docs2 = collection.get(
+    include=["documents"]
+)
+print(docs2)
+
+print("get documents 2")
+docs3 = collection.get()
+print(docs3)
+
+
+print("query")
 
 results = collection.query(
     query_embeddings=[[1.11, -0.72, 2.4]],
@@ -41,7 +97,7 @@ print("now the rest....")
 
 while True:
     print("sleep")
-    time.sleep(5)
+    time.sleep(120)
 
 print("this is finished")
     
