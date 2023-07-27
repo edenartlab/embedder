@@ -52,14 +52,15 @@ print("yay")
 
 
 docs = [
-    {"doc": "cat.", "metadata": {"tag": "animal"}, "id": "idd1", "embedding": [1.2512, -0.5, 2.9] },
-    {"doc": "dog.", "metadata": {"tag": "animal"}, "id": "idd2", "embedding": [1.0512, -0.6, 2.7]},
-    {"doc": "pig.", "metadata": {"tag": "animal"}, "id": "idd3", "embedding": [1.4512, -0.4, 3.1]},
-    {"doc": "blue.", "metadata": {"tag": "color"}, "id": "idd4", "embedding": [-1.2512, 2.5, 1.8]},
-    {"doc": "red.", "metadata": {"tag": "color"}, "id": "idd5", "embedding": [-1.3512, 2.4, 1.9]},
-    {"doc": "green.", "metadata": {"tag": "color"}, "id": "idd6", "embedding": [-1.2612, 2.2, 1.6]},
-    {"doc": "France.", "metadata": {"tag": "country"}, "id": "idd7", "embedding": [0.2512, 1.5, -2.0]},
-    {"doc": "Germany.", "metadata": {"tag": "country"}, "id": "idd8", "embedding": [0.3512, 1.4, -2.1]},    
+    {"doc": "cat.", "metadata": {"tag": "animal"}, "id": "ide1", "embedding": [1.2412, -0.5, 2.9] },
+    {"doc": "dog.", "metadata": {"tag": "animal"}, "id": "ide2", "embedding": [1.0412, -0.6, 2.7]},
+    {"doc": "pig.", "metadata": {"tag": "animal"}, "id": "ide3", "embedding": [1.4412, -0.4, 3.1]},
+    {"doc": "blue.", "metadata": {"tag": "color"}, "id": "ide4", "embedding": [-1.2412, 2.5, 1.8]},
+    {"doc": "red.", "metadata": {"tag": "color"}, "id": "ide5", "embedding": [-1.3412, 2.4, 1.9]},
+    {"doc": "green.", "metadata": {"tag": "color"}, "id": "ide6", "embedding": [-1.2512, 2.2, 1.6]},
+    {"doc": "France.", "metadata": {"tag": "country"}, "id": "ide7", "embedding": [0.2412, 1.5, -2.0]},
+    {"doc": "Germany.", "metadata": {"tag": "country"}, "id": "ide8", "embedding": [0.3412, 1.4, -2.1]},    
+    {"doc": "Japan.", "metadata": {"tag": "country"}, "id": "ide9", "embedding": [0.341, 1.41, -2.2]}, 
 ]
 
 # print("lets add")
