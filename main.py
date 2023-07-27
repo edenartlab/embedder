@@ -27,7 +27,7 @@ print("all collections!")
 print(chroma_client.list_collections())
 print("---all collections done----")
 
-collection = chroma_client.get_or_create_collection(name="test4")
+collection = chroma_client.get_or_create_collection(name="test5")
 print(collection)
 
 print("stats :)")
@@ -36,44 +36,44 @@ print(collection.count())
 print("peek")
 print(collection.peek())
 
-print("get documents")
-docs2 = collection.get(
-    include=["documents"]
-)
-print(docs2)
+# print("get documents")
+# docs2 = collection.get(
+#     include=["documents"]
+# )
+# print(docs2)
 
-print("get documents 2")
-docs3 = collection.get()
-print(docs3)
+# print("get documents 2")
+# docs3 = collection.get()
+# print(docs3)
 
 
 print("yay")
 
 
 
-docs = [
-    {"doc": "cat.", "metadata": {"tag": "animal"}, "id": "ide1", "embedding": [1.2412, -0.5, 2.9] },
-    {"doc": "dog.", "metadata": {"tag": "animal"}, "id": "ide2", "embedding": [1.0412, -0.6, 2.7]},
-    {"doc": "pig.", "metadata": {"tag": "animal"}, "id": "ide3", "embedding": [1.4412, -0.4, 3.1]},
-    {"doc": "blue.", "metadata": {"tag": "color"}, "id": "ide4", "embedding": [-1.2412, 2.5, 1.8]},
-    {"doc": "red.", "metadata": {"tag": "color"}, "id": "ide5", "embedding": [-1.3412, 2.4, 1.9]},
-    {"doc": "green.", "metadata": {"tag": "color"}, "id": "ide6", "embedding": [-1.2512, 2.2, 1.6]},
-    {"doc": "France.", "metadata": {"tag": "country"}, "id": "ide7", "embedding": [0.2412, 1.5, -2.0]},
-    {"doc": "Germany.", "metadata": {"tag": "country"}, "id": "ide8", "embedding": [0.3412, 1.4, -2.1]},    
-    {"doc": "Japan.", "metadata": {"tag": "country"}, "id": "ide9", "embedding": [0.341, 1.41, -2.2]}, 
-]
+# docs = [
+#     {"doc": "cat.", "metadata": {"tag": "animal"}, "id": "ide1", "embedding": [1.2412, -0.5, 2.9] },
+#     {"doc": "dog.", "metadata": {"tag": "animal"}, "id": "ide2", "embedding": [1.0412, -0.6, 2.7]},
+#     {"doc": "pig.", "metadata": {"tag": "animal"}, "id": "ide3", "embedding": [1.4412, -0.4, 3.1]},
+#     {"doc": "blue.", "metadata": {"tag": "color"}, "id": "ide4", "embedding": [-1.2412, 2.5, 1.8]},
+#     {"doc": "red.", "metadata": {"tag": "color"}, "id": "ide5", "embedding": [-1.3412, 2.4, 1.9]},
+#     {"doc": "green.", "metadata": {"tag": "color"}, "id": "ide6", "embedding": [-1.2512, 2.2, 1.6]},
+#     {"doc": "France.", "metadata": {"tag": "country"}, "id": "ide7", "embedding": [0.2412, 1.5, -2.0]},
+#     {"doc": "Germany.", "metadata": {"tag": "country"}, "id": "ide8", "embedding": [0.3412, 1.4, -2.1]},    
+#     {"doc": "Japan.", "metadata": {"tag": "country"}, "id": "ide9", "embedding": [0.341, 1.41, -2.2]}, 
+# ]
 
 # print("lets add")
 # print([doc['doc'] for doc in docs])
 # print([doc['metadata'] for doc in docs])
 # print([doc['id'] for doc in docs])
 
-collection.add(
-    documents=[doc['doc'] for doc in docs],
-    embeddings=[doc['embedding'] for doc in docs],
-    metadatas=[doc['metadata'] for doc in docs],
-    ids=[doc['id'] for doc in docs]
-)
+# collection.add(
+#     documents=[doc['doc'] for doc in docs],
+#     embeddings=[doc['embedding'] for doc in docs],
+#     metadatas=[doc['metadata'] for doc in docs],
+#     ids=[doc['id'] for doc in docs]
+# )
 
 print("done adding, check again")
 
@@ -84,25 +84,25 @@ print(collection.count())
 print("peek")
 print(collection.peek())
 
-print("get documents")
-docs2 = collection.get(
-    include=["documents"]
-)
-print(docs2)
+# print("get documents")
+# docs2 = collection.get(
+#     include=["documents"]
+# )
+# print(docs2)
 
-print("get documents 2")
-docs3 = collection.get()
-print(docs3)
+# print("get documents 2")
+# docs3 = collection.get()
+# print(docs3)
 
 
 print("query")
 
-results = collection.query(
-    query_embeddings=[[1.113, -0.72, 2.4]],
-    n_results=12
-)
+# results = collection.query(
+#     query_embeddings=[[1.113, -0.72, 2.4]],
+#     n_results=12
+# )
 
-print(results)
+# print(results)
 
 
 
@@ -129,10 +129,10 @@ print("-----------------------")
 
 if True:
 
-    for document in collection.find(limit=10):
-        print("new doc")
+    for document in collection.find():
+        # print("new doc")
         try:
-            print(document)
+            # print(document)
             
             response = requests.get(document['uri'])
             image = Image.open(BytesIO(response.content)).convert("RGB")
@@ -145,21 +145,19 @@ if True:
 
             print(document['_id'], document['uri'], embedding.shape)
 
+            collection.add(
+                #documents=[doc['doc'] for doc in docs],
+                embeddings=[embedding[0]],
+                metadatas=[{"user": document['user']}],
+                ids=[document['_id']]
+            )
+
         except Exception as e:
             print("ERROR", e)
             continue
         
     print("sleep")
     time.sleep(5)
-
-print("-----------------------")
-
-while True:
-    print("sleep")
-    time.sleep(120)
-
-print("this is finished")
-    
 
 
 
