@@ -67,14 +67,14 @@ docs = [
 # print([doc['metadata'] for doc in docs])
 # print([doc['id'] for doc in docs])
 
-# collection.add(
-#     documents=[doc['doc'] for doc in docs],
-#     embeddings=[doc['embedding'] for doc in docs],
-#     metadatas=[doc['metadata'] for doc in docs],
-#     ids=[doc['id'] for doc in docs]
-# )
+collection.add(
+    documents=[doc['doc'] for doc in docs],
+    embeddings=[doc['embedding'] for doc in docs],
+    metadatas=[doc['metadata'] for doc in docs],
+    ids=[doc['id'] for doc in docs]
+)
 
-#print("done adding, check again")
+print("done adding, check again")
 
 
 print("stats")
