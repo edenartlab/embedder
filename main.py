@@ -147,7 +147,7 @@ if True:
 
             collection.add(
                 #documents=[doc['doc'] for doc in docs],
-                embeddings=[embedding[0].to_list()],
+                embeddings=[embedding[0].tolist()],
                 metadatas=[{"user": str(document['user'])}],
                 ids=[str(document['_id'])]
             )
