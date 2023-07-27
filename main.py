@@ -122,14 +122,14 @@ model, preprocess = clip.load("ViT-B/32", device=device)
 
 client = MongoClient(MONGO_URI)
 db = client['eden-dev']
-collection = db['creations']
+creations = db['creations']
 
 
 print("-----------------------")
 
 if True:
 
-    for document in collection.find():
+    for document in creations.find():
         # print("new doc")
         try:
             # print(document)
