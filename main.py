@@ -148,8 +148,8 @@ if True:
             collection.add(
                 #documents=[doc['doc'] for doc in docs],
                 embeddings=[embedding[0]],
-                metadatas=[{"user": document['user']}],
-                ids=[document['_id']]
+                metadatas=[{"user": str(document['user'])}],
+                ids=[str(document['_id'])]
             )
 
         except Exception as e:
