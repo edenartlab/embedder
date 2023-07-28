@@ -129,7 +129,7 @@ print("-----------------------")
 
 d_idx = 0
 
-if True:
+if False:
 
     for document in creations.find():
         d_idx += 1
@@ -165,7 +165,10 @@ if True:
 
 
 
-
+while True:
+    print("sleep")
+    time.sleep(5000)
+    
 
 # print("lets do chromadb 5 345345 5")
 # import chromadb
