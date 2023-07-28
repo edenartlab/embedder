@@ -127,9 +127,12 @@ creations = db['creations']
 
 print("-----------------------")
 
+d_idx = 0
+
 if True:
 
     for document in creations.find():
+        d_idx += 1
         # print("new doc")
         try:
             # print(document)
@@ -143,7 +146,7 @@ if True:
             image_features /= image_features.norm(dim=-1, keepdim=True)
             embedding = image_features.cpu().numpy()
 
-            print(document['_id'], document['uri'], embedding.shape)
+            #print(document['_id'], document['uri'], embedding.shape)
 
             collection.add(
                 #documents=[doc['doc'] for doc in docs],
@@ -153,6 +156,7 @@ if True:
             )
 
         except Exception as e:
+            print("error on: ", d_idx, " :: ", document['uri'], " :: ", document['_id'])
             print("ERROR", e)
             continue
         
