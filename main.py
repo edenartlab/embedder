@@ -22,8 +22,7 @@ generators = db['generators']
 chroma_client = chromadb.HttpClient(host=CHROMA_HOST, port=8000)
 collection = chroma_client.get_or_create_collection(name="creation_clip_embeddings")
 print(chroma_client.list_collections())
-print(collection.count())
-print(collection.peek())
+print(f"Clip embeddings collection size: {collection.count()}")
 
 # setup CLIP
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -61,6 +60,8 @@ def induct_creation(document):
         metadatas=[{"user": str(document['user'])}],
         ids=[str(document['_id'])]
     )
+
+    print(f"inducted creation {document['_id']}")
 
 
 def scan_unembedded_creations():
@@ -100,7 +101,14 @@ def scan_unembedded_creations():
             },
             {
                 "$match": {
-                    "embedding": None,
+                    "$or": [
+                        {"embedding": None},
+                        {"embedding.embedding": {"$exists": False}},
+                        {"embedding.embedding": None},
+                        {"embedding.embedding": {"$size": 0}},
+                        {"embedding.score": {"$exists": False}},
+                        {"embedding.score": None}
+                    ],
                     "task_info.generator_info._id": {"$in": generator_ids}
                 }
             }
@@ -119,8 +127,10 @@ def scan_unembedded_creations():
         page_documents = list(cursor)
         
         if not page_documents:
+            print(f"Total number of creations scanned through: {count}")
             return
         
+        print(f"Try to induct {len(page_documents)} creations")
         for document in page_documents:
             try:
                 induct_creation(document)
@@ -129,14 +139,12 @@ def scan_unembedded_creations():
                 print(f"error for creation {document['_id']}: {e}")
         
         last_id = page_documents[-1]['_id']
-    
-    print(f"Total number of creations scanned through: {count}")
-        
+
+
 
 while True:
     try:
-        #scan_unembedded_creations() #disable for a minute
-        print("hello")
+        scan_unembedded_creations()
     except Exception as e:
         print(e)
-    time.sleep(1)
+    time.sleep(10)
