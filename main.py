@@ -1,285 +1,141 @@
-print("main 2")
-
 import time
 import os
 import requests
+from bson.objectid import ObjectId
 from pymongo import MongoClient
 from PIL import Image
 from io import BytesIO
-#import numpy as np
 import torch
 import clip
-#dotenv
-
-#from dotenv import load_dotenv
-#load_dotenv()
-
-print("begin this process")
-
-
-print("lets do chromadb!")
 import chromadb
-chroma_client = chromadb.HttpClient(host="chromadb.mars", port=8000)
-print("great")
-print(chroma_client)
-
-print("all collections!")
-print(chroma_client.list_collections())
-print("---all collections done----")
-
-collection = chroma_client.get_or_create_collection(name="test5")
-print(collection)
-
-print("stats :)")
-print(collection.count())
-
-print("peek")
-print(collection.peek())
-
-# print("get documents")
-# docs2 = collection.get(
-#     include=["documents"]
-# )
-# print(docs2)
-
-# print("get documents 2")
-# docs3 = collection.get()
-# print(docs3)
-
-
-print("yay")
-
-
-
-# docs = [
-#     {"doc": "cat.", "metadata": {"tag": "animal"}, "id": "ide1", "embedding": [1.2412, -0.5, 2.9] },
-#     {"doc": "dog.", "metadata": {"tag": "animal"}, "id": "ide2", "embedding": [1.0412, -0.6, 2.7]},
-#     {"doc": "pig.", "metadata": {"tag": "animal"}, "id": "ide3", "embedding": [1.4412, -0.4, 3.1]},
-#     {"doc": "blue.", "metadata": {"tag": "color"}, "id": "ide4", "embedding": [-1.2412, 2.5, 1.8]},
-#     {"doc": "red.", "metadata": {"tag": "color"}, "id": "ide5", "embedding": [-1.3412, 2.4, 1.9]},
-#     {"doc": "green.", "metadata": {"tag": "color"}, "id": "ide6", "embedding": [-1.2512, 2.2, 1.6]},
-#     {"doc": "France.", "metadata": {"tag": "country"}, "id": "ide7", "embedding": [0.2412, 1.5, -2.0]},
-#     {"doc": "Germany.", "metadata": {"tag": "country"}, "id": "ide8", "embedding": [0.3412, 1.4, -2.1]},    
-#     {"doc": "Japan.", "metadata": {"tag": "country"}, "id": "ide9", "embedding": [0.341, 1.41, -2.2]}, 
-# ]
-
-# print("lets add")
-# print([doc['doc'] for doc in docs])
-# print([doc['metadata'] for doc in docs])
-# print([doc['id'] for doc in docs])
-
-# collection.add(
-#     documents=[doc['doc'] for doc in docs],
-#     embeddings=[doc['embedding'] for doc in docs],
-#     metadatas=[doc['metadata'] for doc in docs],
-#     ids=[doc['id'] for doc in docs]
-# )
-
-print("done adding, check again")
-
-
-print("stats")
-print(collection.count())
-
-print("peek")
-print(collection.peek())
-
-# print("get documents")
-# docs2 = collection.get(
-#     include=["documents"]
-# )
-# print(docs2)
-
-# print("get documents 2")
-# docs3 = collection.get()
-# print(docs3)
-
-
-print("query")
-
-# results = collection.query(
-#     query_embeddings=[[1.113, -0.72, 2.4]],
-#     n_results=12
-# )
-
-# print(results)
-
-
-
-
-print("now the rest....")
-
-
-
-
 
 MONGO_URI = os.getenv('MONGO_URI')
+CHROMA_HOST = os.getenv('CHROMA_HOST')
 
-print("CONNECT", MONGO_URI)
-
-device = "cuda" if torch.cuda.is_available() else "cpu"
-model, preprocess = clip.load("ViT-B/32", device=device)
-
+# setup mongo
 client = MongoClient(MONGO_URI)
 db = client['eden-dev']
 creations = db['creations']
+generators = db['generators']
+
+# setup chroma
+chroma_client = chromadb.HttpClient(host=CHROMA_HOST, port=8000)
+collection = chroma_client.get_or_create_collection(name="creation_clip_embeddings")
+print(chroma_client.list_collections())
+print(collection.count())
+print(collection.peek())
+
+# setup CLIP
+device = "cuda" if torch.cuda.is_available() else "cpu"
+clip_encoder, preprocess = clip.load("ViT-B/32", device=device)
 
 
-print("-----------------------")
-
-d_idx = 0
-
-if False:
-
-    for document in creations.find():
-        d_idx += 1
-        # print("new doc")
-        try:
-            # print(document)
-            
-            response = requests.get(document['uri'])
-            image = Image.open(BytesIO(response.content)).convert("RGB")
-            image = preprocess(image).unsqueeze(0).to(device)
-
-            with torch.no_grad():
-                image_features = model.encode_image(image)
-            image_features /= image_features.norm(dim=-1, keepdim=True)
-            embedding = image_features.cpu().numpy()
-
-            #print(document['_id'], document['uri'], embedding.shape)
-
-            collection.add(
-                #documents=[doc['doc'] for doc in docs],
-                embeddings=[embedding[0].tolist()],
-                metadatas=[{"user": str(document['user'])}],
-                ids=[str(document['_id'])]
-            )
-
-        except Exception as e:
-            print("error on: ", d_idx, " :: ", document['uri'], " :: ", document['_id'])
-            print("ERROR", e)
-            continue
+def induct_creation(document):
         
-    print("sleep")
-    time.sleep(5)
+    # embed with CLIP
+    response = requests.get(document['uri'])
+    image = Image.open(BytesIO(response.content)).convert("RGB")
+    image = preprocess(image).unsqueeze(0).to(device)
+    with torch.no_grad():
+        image_features = clip_encoder.encode_image(image)
+    image_features /= image_features.norm(dim=-1, keepdim=True)
+    embedding = image_features.cpu().numpy()
+    
+    # aesthetic score
+    score = 0
+    
+    # update mongo
+    creations.update_one(
+        {'_id': document['_id']},
+        {
+            '$set': {
+                'embedding.embedding': embedding.tolist(),
+                'embedding.score': score
+            }
+        }
+    )
+    
+    # add to chroma
+    collection.upsert(
+        embeddings=[embedding[0].tolist()],
+        metadatas=[{"user": str(document['user'])}],
+        ids=[str(document['_id'])]
+    )
 
 
+def scan_unembedded_creations():
+    PAGE_SIZE = 100
+    
+    generator_names = ["create", "remix"]
+    generator_ids = [g['_id'] for g in generators.find({
+        "generatorName": {"$in": generator_names}
+    })]
+    
+    count = 0
+    last_id = None
+    
+    while True:
+        pipeline = [
+            {
+                "$lookup": {
+                    "from": "tasks",
+                    "localField": "task",
+                    "foreignField": "_id",
+                    "as": "task_info"
+                }
+            },
+            {
+                "$unwind": "$task_info"
+            },
+            {
+                "$lookup": {
+                    "from": "generators",
+                    "localField": "task_info.generator",
+                    "foreignField": "_id",
+                    "as": "task_info.generator_info"
+                }
+            },
+            {
+                "$unwind": "$task_info.generator_info"
+            },
+            {
+                "$match": {
+                    "embedding": None,
+                    "task_info.generator_info._id": {"$in": generator_ids}
+                }
+            }
+        ]
+        
+        # paginate
+        if last_id is not None:
+            pipeline.append({
+                "$match": {
+                    "_id": {"$gt": last_id}
+                }
+            })
+        
+        pipeline.append({"$limit": PAGE_SIZE})
+        cursor = creations.aggregate(pipeline)
+        page_documents = list(cursor)
+        
+        if not page_documents:
+            return
+        
+        for document in page_documents:
+            try:
+                induct_creation(document)
+                count += 1
+            except Exception as e:
+                print(f"error for creation {document['_id']}: {e}")
+        
+        last_id = page_documents[-1]['_id']
+    
+    print(f"Total number of creations scanned through: {count}")
+        
 
 while True:
-    print("sleep")
-    time.sleep(5000)
-    
-
-# print("lets do chromadb 5 345345 5")
-# import chromadb
-# #chroma_client = chromadb.Client()
-# #chroma_client = chromadb.HttpClient(host="chromadb.mars", port=8000)
-# chroma_client = chromadb.HttpClient(host="chromadb.eden.art", port=8000)
-# print(chroma_client)
-# print("great 33 98u2")
-
-
-# print("hello 1")
-
-# collection = chroma_client.get_or_create_collection(name="test4")
-# #collection = chroma_client.get_collection(name="test4")
-
-# print(collection)
-# print("hello 2")
-# # collection = chroma_client.get_collection(name="test1")
-
-
-# docs = [
-#     {"doc": "cat", "metadata": {"tag": "animal"}, "id": "id1", "embedding": [1.2, -0.5, 2.9] },
-#     {"doc": "dog", "metadata": {"tag": "animal"}, "id": "id2", "embedding": [1.0, -0.6, 2.7]},
-#     {"doc": "pig", "metadata": {"tag": "animal"}, "id": "id3", "embedding": [1.4, -0.4, 3.1]},
-#     {"doc": "blue", "metadata": {"tag": "color"}, "id": "id4", "embedding": [-1.2, 2.5, 1.8]},
-#     {"doc": "red", "metadata": {"tag": "color"}, "id": "id5", "embedding": [-1.3, 2.4, 1.9]},
-#     {"doc": "green", "metadata": {"tag": "color"}, "id": "id6", "embedding": [-1.25, 2.2, 1.6]},
-#     {"doc": "France", "metadata": {"tag": "country"}, "id": "id7", "embedding": [0.2, 1.5, -2.0]},
-#     {"doc": "Germany", "metadata": {"tag": "country"}, "id": "id8", "embedding": [0.3, 1.4, -2.1]},    
-# ]
-
-# # print("lets add")
-# # print(collection)
-# # print("hello 3")
-
-# # collection.add(
-# #     documents=[doc['doc'] for doc in docs],
-# #     embeddings=[doc['embedding'] for doc in docs],
-# #     metadatas=[doc['metadata'] for doc in docs],
-# #     ids=[doc['id'] for doc in docs]
-# # )
-
-# print("hello 3")
-# # print([doc['doc'] for doc in docs])
-# # print([doc['metadata'] for doc in docs])
-# # print([doc['id'] for doc in docs])
-# print(collection)
-
-# results = collection.query(
-#     query_embeddings=[[1.11, -0.72, 2.4]],
-#     n_results=3
-# )
-
-# print(results)
-
-
-# print("now the rest....")
-
-# print("GO!!!!")
-
-# MONGO_URI = os.getenv('MONGO_URI')
-
-# print("CONNECT", MONGO_URI)
-
-# device = "cuda" if torch.cuda.is_available() else "cpu"
-# model, preprocess = clip.load("ViT-B/32", device=device)
-
-# client = MongoClient(MONGO_URI)
-# db = client['eden-dev']
-# collection = db['creations']
-
-# # docker build -t embedder .
-# # docker run -p 27017:27017 -it embedder
-# # 27017
-
-
-
-# '''
-
-# save to Embeddings collection
-# _id
-# creation
-# embedding
-# knn
-
-
-# '''
-
-
-# while True:
-
-#     # for document in collection.find(limit=3):
-#     #     print("new doc")
-#     #     try:
-#     #         print(document)
-            
-#     #         response = requests.get(document['uri'])
-#     #         image = Image.open(BytesIO(response.content)).convert("RGB")
-#     #         image = preprocess(image).unsqueeze(0).to(device)
-
-#     #         with torch.no_grad():
-#     #             image_features = model.encode_image(image)
-#     #         image_features /= image_features.norm(dim=-1, keepdim=True)
-#     #         embedding = image_features.cpu().numpy()
-
-#     #         print(document['_id'], document['uri'], embedding.shape)
-
-#     #     except Exception as e:
-#     #         print("ERROR", e)
-#     #         continue
-        
-#     print("sleep")
-#     time.sleep(5000)
-    
+    try:
+        scan_unembedded_creations()
+    except Exception as e:
+        print(e)
+    time.sleep(1)
