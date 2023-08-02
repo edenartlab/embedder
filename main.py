@@ -1,3 +1,6 @@
+import sys
+sys.path.append('CLIP_assisted_data_labeling')
+
 import time
 import os
 import requests
@@ -6,11 +9,13 @@ from pymongo import MongoClient
 from PIL import Image
 from io import BytesIO
 import torch
-import clip
 import chromadb
+from utils.embedder import AestheticRegressor
 
 MONGO_URI = os.getenv('MONGO_URI')
 CHROMA_HOST = os.getenv('CHROMA_HOST')
+model_path = "combo_2023-08-02_03:48:00_8.1k_imgs_80_epochs_-1.0000_mse.pth"
+device = "cpu"
 
 # setup mongo
 client = MongoClient(MONGO_URI)
@@ -24,39 +29,34 @@ collection = chroma_client.get_or_create_collection(name="creation_clip_embeddin
 print(chroma_client.list_collections())
 print(f"Clip embeddings collection size: {collection.count()}")
 
-# setup CLIP
-device = "cuda" if torch.cuda.is_available() else "cpu"
-clip_encoder, preprocess = clip.load("ViT-B/32", device=device)
+# scorer + embedder
+aesthetic_regressor = AestheticRegressor(model_path, device)
 
 
 def induct_creation(document):
-        
-    # embed with CLIP
     response = requests.get(document['uri'])
     image = Image.open(BytesIO(response.content)).convert("RGB")
-    image = preprocess(image).unsqueeze(0).to(device)
-    with torch.no_grad():
-        image_features = clip_encoder.encode_image(image)
-    image_features /= image_features.norm(dim=-1, keepdim=True)
-    embedding = image_features.cpu().numpy()
-    
+
     # aesthetic score
-    score = 0
+    score, features = aesthetic_regressor.predict_score(image)
+    embedding = features.squeeze().numpy().tolist()
     
     # update mongo
     creations.update_one(
         {'_id': document['_id']},
         {
             '$set': {
-                'embedding.embedding': embedding.tolist(),
-                'embedding.score': score
+                'embedding': {
+                    'embedding': embedding,
+                    'score': score
+                }
             }
         }
     )
     
     # add to chroma
     collection.upsert(
-        embeddings=[embedding[0].tolist()],
+        embeddings=[embedding],
         metadatas=[{"user": str(document['user'])}],
         ids=[str(document['_id'])]
     )
@@ -144,7 +144,7 @@ def scan_unembedded_creations():
 
 while True:
     try:
-        print("hello world") #scan_unembedded_creations()
+        scan_unembedded_creations()
     except Exception as e:
         print(e)
     time.sleep(10)
