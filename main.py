@@ -144,7 +144,7 @@ def scan_unembedded_creations():
 
 while True:
     try:
-        scan_unembedded_creations()
+        #scan_unembedded_creations()
     except Exception as e:
         print(e)
     time.sleep(10)
