@@ -16,6 +16,7 @@ MONGO_URI = os.getenv('MONGO_URI')
 CHROMA_HOST = os.getenv('CHROMA_HOST')
 model_path = "combo_2023-08-02_03:48:00_8.1k_imgs_80_epochs_-1.0000_mse.pth"
 device = "cpu"
+generator_names = ["create", "remix", "blend", "upscale", "real2real", "interpolate", "wav2lip"]
 
 # setup mongo
 client = MongoClient(MONGO_URI)
@@ -34,7 +35,13 @@ aesthetic_regressor = AestheticRegressor(model_path, device)
 
 
 def induct_creation(document):
-    response = requests.get(document['uri'])
+    uri = document['thumbnail']
+
+    if not uri:
+        print(f"skip creation {document['_id']}, no thumbnail")
+        return
+    
+    response = requests.get(uri)
     image = Image.open(BytesIO(response.content)).convert("RGB")
 
     # aesthetic score
@@ -67,7 +74,6 @@ def induct_creation(document):
 def scan_unembedded_creations():
     PAGE_SIZE = 100
     
-    generator_names = ["create", "remix"]
     generator_ids = [g['_id'] for g in generators.find({
         "generatorName": {"$in": generator_names}
     })]
@@ -147,4 +153,4 @@ while True:
         scan_unembedded_creations()
     except Exception as e:
         print(e)
-    time.sleep(10)
+    time.sleep(5)
