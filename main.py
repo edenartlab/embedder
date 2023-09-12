@@ -30,7 +30,26 @@ collection = chroma_client.get_or_create_collection(name="creation_clip_embeddin
 print(chroma_client.list_collections())
 print(f"Clip embeddings collection size: {collection.count()}")
 
-# scorer + embedder
+# pre-populate chroma with all creations which already have embeddings
+pipeline = [
+    {
+        "$match": {
+            "embedding": {"$exists": True},
+            "embedding.embedding": {"$exists": True},
+            "embedding.score": {"$exists": True}
+        }
+    }
+]
+documents = creations.aggregate(pipeline)
+for document in documents:
+    collection.upsert(
+        embeddings=[document['embedding']['embedding']],
+        metadatas=[{"user": str(document['user'])}],
+        ids=[str(document['_id'])]
+    )
+print(f"Chroma now has {collection.count()} creations")
+
+# load scorer + embedder
 aesthetic_regressor = AestheticRegressor(model_path, device)
 
 
