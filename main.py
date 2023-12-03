@@ -86,7 +86,7 @@ print("AESTH", aesthetic_regressor)
 
 def induct_creation(document):
     uri = document['thumbnail']
-
+    print("lets go", uri)
     if not uri:
         print(f"skip creation {document['_id']}, no thumbnail")
         return
@@ -111,6 +111,7 @@ def induct_creation(document):
         print(f"skip creation {document['_id']}, invalid score={score}")
         return
 
+    print("SET SCIOR", score)
     # update mongo
     creations.update_one(
         {'_id': document['_id']},
@@ -203,7 +204,6 @@ def scan_unembedded_creations():
         for document in page_documents:
             try:
                 print("inducting")
-                print(document)
                 induct_creation(document)
                 count += 1
             except Exception as e:
