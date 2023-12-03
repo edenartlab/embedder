@@ -210,8 +210,8 @@ def scan_unembedded_creations():
 
 while True:
     try:
-        #scan_unembedded_creations()
         print("hello embedder!")
+        scan_unembedded_creations()
     except Exception as e:
         print(e)
     time.sleep(5)
