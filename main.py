@@ -178,7 +178,7 @@ from utils.embedder import AestheticRegressor
 while True:
     try:
         #scan_unembedded_creations()
-        print("hello embedder")
+        print("hello embedder!")
     except Exception as e:
         print(e)
     time.sleep(5)
