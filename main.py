@@ -11,7 +11,7 @@ from pymongo import MongoClient
 from PIL import Image
 from io import BytesIO
 import torch
-import chromadb
+# import chromadb
 from utils.embedder import AestheticRegressor
 
 print("e3")
@@ -101,6 +101,11 @@ def induct_creation(document):
         print(f"skip creation {document['_id']}, no embedding")
         return
     
+    # check if score is valid (should be >0)
+    if score <= 0:
+        print(f"skip creation {document['_id']}, invalid score={score}")
+        return
+
     # update mongo
     creations.update_one(
         {'_id': document['_id']},
@@ -124,80 +129,82 @@ def induct_creation(document):
     print(f"inducted creation {document['_id']}")
 
 
-# def scan_unembedded_creations():
-#     PAGE_SIZE = 100
+def scan_unembedded_creations():
+    PAGE_SIZE = 100
     
-#     generator_ids = [g['_id'] for g in generators.find({
-#         "generatorName": {"$in": generator_names}
-#     })]
+    generator_ids = [g['_id'] for g in generators.find({
+        "generatorName": {"$in": generator_names}
+    })]
     
-#     count = 0
-#     last_id = None
+    count = 0
+    last_id = None
     
-#     while True:
-#         pipeline = [
-#             {
-#                 "$lookup": {
-#                     "from": "tasks",
-#                     "localField": "task",
-#                     "foreignField": "_id",
-#                     "as": "task_info"
-#                 }
-#             },
-#             {
-#                 "$unwind": "$task_info"
-#             },
-#             {
-#                 "$lookup": {
-#                     "from": "generators",
-#                     "localField": "task_info.generator",
-#                     "foreignField": "_id",
-#                     "as": "task_info.generator_info"
-#                 }
-#             },
-#             {
-#                 "$unwind": "$task_info.generator_info"
-#             },
-#             {
-#                 "$match": {
-#                     "$or": [
-#                         {"embedding": None},
-#                         {"embedding.embedding": {"$exists": False}},
-#                         {"embedding.embedding": None},
-#                         {"embedding.embedding": {"$size": 0}},
-#                         {"embedding.score": {"$exists": False}},
-#                         {"embedding.score": None}
-#                     ],
-#                     "task_info.generator_info._id": {"$in": generator_ids}
-#                 }
-#             }
-#         ]
+    while True:
+        pipeline = [
+            {
+                "$lookup": {
+                    "from": "tasks",
+                    "localField": "task",
+                    "foreignField": "_id",
+                    "as": "task_info"
+                }
+            },
+            {
+                "$unwind": "$task_info"
+            },
+            {
+                "$lookup": {
+                    "from": "generators",
+                    "localField": "task_info.generator",
+                    "foreignField": "_id",
+                    "as": "task_info.generator_info"
+                }
+            },
+            {
+                "$unwind": "$task_info.generator_info"
+            },
+            {
+                "$match": {
+                    "$or": [
+                        {"embedding": None},
+                        # {"embedding.embedding": {"$exists": False}},
+                        # {"embedding.embedding": None},
+                        # {"embedding.embedding": {"$size": 0}},
+                        {"embedding.score": {"$exists": False}},
+                        {"embedding.score": None}
+                    ],
+                    "task_info.generator_info._id": {"$in": generator_ids}
+                }
+            }
+        ]
         
-#         # paginate
-#         if last_id is not None:
-#             pipeline.append({
-#                 "$match": {
-#                     "_id": {"$gt": last_id}
-#                 }
-#             })
+        # paginate
+        if last_id is not None:
+            pipeline.append({
+                "$match": {
+                    "_id": {"$gt": last_id}
+                }
+            })
         
-#         pipeline.append({"$limit": PAGE_SIZE})
-#         cursor = creations.aggregate(pipeline)
-#         page_documents = list(cursor)
+        pipeline.append({"$limit": PAGE_SIZE})
+        cursor = creations.aggregate(pipeline)
+        page_documents = list(cursor)
         
-#         if not page_documents:
-#             print(f"Total number of creations scanned through: {count}")
-#             return
+        if not page_documents:
+            print(f"Total number of creations scanned through: {count}")
+            return
         
-#         print(f"Try to induct {len(page_documents)} creations")
-#         for document in page_documents:
-#             try:
-#                 induct_creation(document)
-#                 count += 1
-#             except Exception as e:
-#                 print(f"error for creation {document['_id']}: {e}")
+        print(f"Try to induct {len(page_documents)} creations")
+        for document in page_documents:
+            try:
+                print("inducting")
+                print(document)
+                induct_creation(document)
+                count += 1
+            except Exception as e:
+                print(f"error for creation {document['_id']}: {e}")
         
-#         last_id = page_documents[-1]['_id']
+        last_id = page_documents[-1]['_id']
 
 
 
