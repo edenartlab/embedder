@@ -12,25 +12,25 @@ import torch
 import chromadb
 from utils.embedder import AestheticRegressor
 
-# MONGO_URI = os.getenv('MONGO_URI')
-# CHROMA_HOST = os.getenv('CHROMA_HOST')
-# model_path = "combo_2023-08-02_03:48:00_8.1k_imgs_80_epochs_-1.0000_mse.pth"
-# device = "cpu"
-# generator_names = ["create", "remix", "blend", "upscale", "real2real", "interpolate", "wav2lip"]
+MONGO_URI = os.getenv('MONGO_URI')
+CHROMA_HOST = os.getenv('CHROMA_HOST')
+model_path = "combo_2023-08-02_03:48:00_8.1k_imgs_80_epochs_-1.0000_mse.pth"
+device = "cpu"
+generator_names = ["create", "remix", "blend", "upscale", "real2real", "interpolate", "wav2lip"]
 
-# # setup mongo
-# client = MongoClient(MONGO_URI)
-# db = client['eden-dev']
-# creations = db['creations']
-# generators = db['generators']
+# setup mongo
+client = MongoClient(MONGO_URI)
+db = client['eden-dev']
+creations = db['creations']
+generators = db['generators']
 
 # # setup chroma
-# chroma_client = chromadb.HttpClient(host=CHROMA_HOST, port=8000)
-# collection = chroma_client.get_or_create_collection(name="creation_clip_embeddings")
-# print(chroma_client.list_collections())
-# print(f"Clip embeddings collection size: {collection.count()}")
+chroma_client = chromadb.HttpClient(host=CHROMA_HOST, port=8000)
+collection = chroma_client.get_or_create_collection(name="creation_clip_embeddings")
+print(chroma_client.list_collections())
+print(f"Clip embeddings collection size: {collection.count()}")
 
-# # pre-populate chroma with all creations which already have embeddings
+# pre-populate chroma with all creations which already have embeddings
 # pipeline = [
 #     {
 #         "$match": {
@@ -47,11 +47,14 @@ from utils.embedder import AestheticRegressor
 #         metadatas=[{"user": str(document['user'])}],
 #         ids=[str(document['_id'])]
 #     )
+
 # print(f"Chroma now has {collection.count()} creations")
 
 # # load scorer + embedder
-# aesthetic_regressor = AestheticRegressor(model_path, device)
+aesthetic_regressor = AestheticRegressor(model_path, device)
 
+
+print("AESTH", aesthetic_regressor)
 
 # def induct_creation(document):
 #     uri = document['thumbnail']
