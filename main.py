@@ -11,7 +11,7 @@ from pymongo import MongoClient
 from PIL import Image
 from io import BytesIO
 import torch
-# import chromadb
+import chromadb
 from utils.embedder import AestheticRegressor
 
 print("e3")
