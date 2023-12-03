@@ -1,5 +1,7 @@
+print("e1")
 import sys
 sys.path.append('CLIP_assisted_data_labeling')
+print("e2")
 
 import time
 import os
@@ -12,18 +14,22 @@ import torch
 import chromadb
 from utils.embedder import AestheticRegressor
 
+print("e3")
+
 MONGO_URI = os.getenv('MONGO_URI')
 MONGO_DB_NAME = os.getenv('MONGO_DB_NAME')
 CHROMA_HOST = os.getenv('CHROMA_HOST')
 model_path = "combo_2023-08-02_03:48:00_8.1k_imgs_80_epochs_-1.0000_mse.pth"
 device = "cpu"
 generator_names = ["create", "remix", "blend", "upscale", "real2real", "interpolate", "wav2lip"]
+print("e4")
 
 # setup mongo
 client = MongoClient(MONGO_URI)
 db = client[MONGO_DB_NAME]
 creations = db['creations']
 generators = db['generators']
+print("e5")
 
 # # setup chroma
 # chroma_client = chromadb.HttpClient(host=CHROMA_HOST, port=8000)
@@ -53,7 +59,9 @@ pipeline = [
     }
 ]
 
+print("e7")
 documents = creations.aggregate(pipeline)
+print("e9")
 for document in documents:
     print(document)
     # collection.upsert(
@@ -61,6 +69,7 @@ for document in documents:
     #     metadatas=[{"user": str(document['user'])}],
     #     ids=[str(document['_id'])]
     # )
+print("e8")
 
 # print(f"Chroma now has {collection.count()} creations")
 
