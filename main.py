@@ -32,7 +32,7 @@ generators = db['generators']
 print("e5")
 
 # # setup chroma
-print("try chroma")
+print("try chroma", CHROMA_HOST)
 try:
     chroma_client = chromadb.HttpClient(host=CHROMA_HOST, port=8000)
     collection = chroma_client.get_or_create_collection(name="creation_clip_embeddings")
@@ -145,7 +145,8 @@ def scan_unembedded_creations():
     count = 0
     last_id = None
     
-    while True:
+    #while True:
+    if True:  # run once
         pipeline = [
             {
                 "$lookup": {
@@ -181,14 +182,22 @@ def scan_unembedded_creations():
                     ],
                     "task_info.generator_info._id": {"$in": generator_ids}
                 }
+            },
+
+
+            # temporarily reverse order
+            {
+                "$sort": {"_id": -1}
             }
+
         ]
         
         # paginate
         if last_id is not None:
             pipeline.append({
                 "$match": {
-                    "_id": {"$gt": last_id}
+                    # "_id": {"$gt": last_id}
+                    "_id": {"$lt": last_id}
                 }
             })
         
