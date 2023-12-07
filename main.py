@@ -1,8 +1,8 @@
-print("new version ")
-print("e1A")
+print("new version #2")
+print("e1C")
 import sys
 sys.path.append('CLIP_assisted_data_labeling')
-print("e2B")
+print("e2D")
 
 import time
 import os
@@ -147,6 +147,7 @@ def scan_unembedded_creations():
 
     batch_size = 1000
     processed_count = 0
+    inductions = 0
 
     while True:
         cursor = creations.find(query).sort(sort_order).skip(processed_count).limit(batch_size)
@@ -154,15 +155,15 @@ def scan_unembedded_creations():
         batch = list(cursor)
         if not batch:
             # No more documents to process
-            print(f"Total number of creations scanned through: {processed_count}")
+            print(f"Total number of creations scanned through: {processed_count}, inductions: {inductions}")
 
             break
 
         for doc in batch:
             try:
-                print(" _- induct -_ -> ", doc["thumbnail"])
+                print(":) _- induct -_ -> ", doc["thumbnail"])
                 induct_creation(doc)
-                count += 1
+                inductions += 1
             except Exception as e:
                 print(f"error for creation {doc['_id']}: {e}")
 
