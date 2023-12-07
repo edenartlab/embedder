@@ -1,8 +1,8 @@
-print("new version #2")
-print("e1C")
+print("new version #3")
+print("e1C 222")
 import sys
 sys.path.append('CLIP_assisted_data_labeling')
-print("e2D")
+print("e2D333 ")
 
 import time
 import os
@@ -21,6 +21,8 @@ print("e3")
 MONGO_URI = os.getenv('MONGO_URI')
 MONGO_DB_NAME = os.getenv('MONGO_DB_NAME')
 CHROMA_HOST = os.getenv('CHROMA_HOST')
+print("HOST IS", CHROMA_HOST)
+
 model_path = "combo_2023-08-02_03:48:00_8.1k_imgs_80_epochs_-1.0000_mse.pth"
 device = "cpu"
 generator_names = ["create", "remix", "blend", "upscale", "real2real", "interpolate", "wav2lip"]
