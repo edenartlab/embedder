@@ -1,12 +1,13 @@
-print("e1")
+print("e1A")
 import sys
 sys.path.append('CLIP_assisted_data_labeling')
-print("e2")
+print("e2B")
 
 import time
 import os
 import requests
 from bson.objectid import ObjectId
+import pymongo
 from pymongo import MongoClient
 from PIL import Image
 from io import BytesIO
@@ -135,96 +136,44 @@ def induct_creation(document):
     print(f"inducted creation {document['_id']}")
 
 
+
+
 def scan_unembedded_creations():
-    PAGE_SIZE = 100
-    
-    generator_ids = [g['_id'] for g in generators.find({
-        "generatorName": {"$in": generator_names}
-    })]
-    
-    count = 0
-    last_id = None
-    
-    #while True:
-    if True:  # run once
-        pipeline = [
-            {
-                "$lookup": {
-                    "from": "tasks",
-                    "localField": "task",
-                    "foreignField": "_id",
-                    "as": "task_info"
-                }
-            },
-            {
-                "$unwind": "$task_info"
-            },
-            {
-                "$lookup": {
-                    "from": "generators",
-                    "localField": "task_info.generator",
-                    "foreignField": "_id",
-                    "as": "task_info.generator_info"
-                }
-            },
-            {
-                "$unwind": "$task_info.generator_info"
-            },
-            {
-                "$match": {
-                    "$or": [
-                        {"embedding": None},
-                        # {"embedding.embedding": {"$exists": False}},
-                        # {"embedding.embedding": None},
-                        # {"embedding.embedding": {"$size": 0}},
-                        {"embedding.score": {"$exists": False}},
-                        {"embedding.score": None}
-                    ],
-                    "task_info.generator_info._id": {"$in": generator_ids}
-                }
-            },
+    query = {
+        "thumbnail": {"$regex": r"\.webp$"},  # Filter for documents where "thumbnail" ends with ".webm"
+    }
+    sort_order = [("insertion_timestamp", pymongo.DESCENDING)]  # Assuming there's an "insertion_timestamp" field
 
+    batch_size = 1000
+    processed_count = 0
 
-            # temporarily reverse order
-            {
-                "$sort": {"_id": -1}
-            }
+    while True:
+        cursor = creations.find(query).sort(sort_order).skip(processed_count).limit(batch_size)
+        
+        batch = list(cursor)
+        if not batch:
+            # No more documents to process
+            print(f"Total number of creations scanned through: {processed_count}")
 
-        ]
-        
-        # paginate
-        if last_id is not None:
-            pipeline.append({
-                "$match": {
-                    # "_id": {"$gt": last_id}
-                    "_id": {"$lt": last_id}
-                }
-            })
-        
-        pipeline.append({"$limit": PAGE_SIZE})
-        cursor = creations.aggregate(pipeline)
-        page_documents = list(cursor)
-        
-        if not page_documents:
-            print(f"Total number of creations scanned through: {count}")
-            return
-        
-        print(f"Try to induct {len(page_documents)} creations")
-        for document in page_documents:
+            break
+
+        for doc in batch:
             try:
-                print("inducting")
-                induct_creation(document)
+                print(" _- induct -_ -> ", doc["thumbnail"])
+                induct_creation(doc)
                 count += 1
             except Exception as e:
-                print(f"error for creation {document['_id']}: {e}")
-        
-        last_id = page_documents[-1]['_id']
+                print(f"error for creation {doc['_id']}: {e}")
 
+        processed_count += len(batch)
+        cursor.close()
+
+    client.close()
 
 
 while True:
     try:
-        print("hello embedder!")
+        print("hello embedder! 2")
         scan_unembedded_creations()
     except Exception as e:
         print(e)
