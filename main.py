@@ -1,3 +1,4 @@
+print("new version ")
 print("e1A")
 import sys
 sys.path.append('CLIP_assisted_data_labeling')
