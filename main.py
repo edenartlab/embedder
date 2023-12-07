@@ -44,38 +44,38 @@ except Exception as e:
     print("Chroma is not available")
 
 # pre-populate chroma with all creations which already have embeddings
-pipeline2 = [
-    {
-        "$match": {
-            "embedding": {"$exists": True},
-            "embedding.embedding": {"$exists": True},
-            "embedding.score": {"$exists": True}
-        }
-    }
-]
+# pipeline2 = [
+#     {
+#         "$match": {
+#             "embedding": {"$exists": True},
+#             "embedding.embedding": {"$exists": True},
+#             "embedding.score": {"$exists": True}
+#         }
+#     }
+# ]
 
-pipeline = [
-    {
-        "$match": {
-            "user": {"$exists": True}
-        }
-    },
-    {
-        "$limit": 50
-    }
-]
+# pipeline = [
+#     {
+#         "$match": {
+#             "user": {"$exists": True}
+#         }
+#     },
+#     {
+#         "$limit": 50
+#     }
+# ]
 
-print("e7")
-documents = creations.aggregate(pipeline)
-print("e9")
-for document in documents:
-    print(document)
-    # collection.upsert(
-    #     embeddings=[document['embedding']['embedding']],
-    #     metadatas=[{"user": str(document['user'])}],
-    #     ids=[str(document['_id'])]
-    # )
-print("e8")
+# print("e7")
+# documents = creations.aggregate(pipeline)
+# print("e9")
+# for document in documents:
+#     print(document)
+#     # collection.upsert(
+#     #     embeddings=[document['embedding']['embedding']],
+#     #     metadatas=[{"user": str(document['user'])}],
+#     #     ids=[str(document['_id'])]
+#     # )
+# print("e8")
 
 # print(f"Chroma now has {collection.count()} creations")
 
@@ -140,7 +140,7 @@ def induct_creation(document):
 
 def scan_unembedded_creations():
     query = {
-        "thumbnail": {"$regex": r"\.webp$"},  # Filter for documents where "thumbnail" ends with ".webm"
+        "thumbnail": {"$regex": r"\.webp$"},  # Filter for documents where "thumbnail" ends with ".webp"
     }
     sort_order = [("insertion_timestamp", pymongo.DESCENDING)]  # Assuming there's an "insertion_timestamp" field
 
