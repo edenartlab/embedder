@@ -1,4 +1,4 @@
-print("new version #4")
+print("new version #5")
 print("e1C 222 aaaa bbb")
 import sys
 sys.path.append('CLIP_assisted_data_labeling')
@@ -163,7 +163,7 @@ def scan_unembedded_creations():
     query = {
         "thumbnail": {"$regex": r"\.webp$"},  # Filter for documents where "thumbnail" ends with ".webp"
     }
-    sort_order = [("insertion_timestamp", pymongo.DESCENDING)]  # Assuming there's an "insertion_timestamp" field
+    sort_order = [("createdAt", -1)]  # Assuming there's an "insertion_timestamp" field
 
     batch_size = 1000
     processed_count = 0
@@ -195,7 +195,7 @@ def scan_unembedded_creations():
 
 while True:
     try:
-        print("hello embedder! 2")
+        print("hello embedder! 3")
         scan_unembedded_creations()
     except Exception as e:
         print(e)
