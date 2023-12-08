@@ -35,10 +35,26 @@ creations = db['creations']
 generators = db['generators']
 print("e5")
 
+import chromadb
+from chromadb.config import Settings
+
+
 # # setup chroma
-print("try chroma", CHROMA_HOST)
+print("try chroma again", CHROMA_HOST)
 try:
-    chroma_client = chromadb.HttpClient(host=CHROMA_HOST, port=8000)
+
+    print("lets auth")
+
+    client = chromadb.HttpClient(
+        host=CHROMA_HOST, 
+        port=8000,
+        settings=Settings(
+            chroma_client_auth_provider="chromadb.auth.basic.BasicAuthClientProvider",
+            chroma_client_auth_credentials="chromadb:changeme"
+        )
+    )
+
+    # chroma_client = chromadb.HttpClient(host=CHROMA_HOST, port=8000)
     collection = chroma_client.get_or_create_collection(name="creation_clip_embeddings")
     print(chroma_client.list_collections())
     print(f"Clip embeddings collection size: {collection.count()}")
