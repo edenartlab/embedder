@@ -1,8 +1,8 @@
-print("new version #3")
-print("e1C 222")
+print("new version #4")
+print("e1C 222 aaaa bbb")
 import sys
 sys.path.append('CLIP_assisted_data_labeling')
-print("e2D333 ")
+print("e2D333 cccc")
 
 import time
 import os
@@ -40,10 +40,10 @@ from chromadb.config import Settings
 
 
 # # setup chroma
-print("try chroma again", CHROMA_HOST)
+print("try chroma again !!!", CHROMA_HOST)
 try:
 
-    print("lets auth")
+    print("lets auth now")
 
     client = chromadb.HttpClient(
         host=CHROMA_HOST, 
@@ -53,6 +53,8 @@ try:
             chroma_client_auth_credentials="chromadb:changeme"
         )
     )
+
+    print(client)
 
     # chroma_client = chromadb.HttpClient(host=CHROMA_HOST, port=8000)
     collection = chroma_client.get_or_create_collection(name="creation_clip_embeddings")
