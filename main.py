@@ -1,4 +1,4 @@
-print("new version #4")
+print("new version #5")
 print("e1C 222 aaaa bbb")
 import sys
 sys.path.append('CLIP_assisted_data_labeling')
@@ -18,10 +18,12 @@ from utils.embedder import AestheticRegressor
 
 print("e3")
 
+IN_DEV = True
 MONGO_URI = os.getenv('MONGO_URI')
 MONGO_DB_NAME = os.getenv('MONGO_DB_NAME')
 CHROMA_HOST = os.getenv('CHROMA_HOST')
 print("HOST IS", CHROMA_HOST)
+
 
 model_path = "combo_2023-08-02_03:48:00_8.1k_imgs_80_epochs_-1.0000_mse.pth"
 device = "cpu"
@@ -165,7 +167,7 @@ def scan_unembedded_creations():
     query = {
         "thumbnail": {"$regex": r"\.webp$"},  # Filter for documents where "thumbnail" ends with ".webp"
     }
-    sort_order = [("insertion_timestamp", pymongo.DESCENDING)]  # Assuming there's an "insertion_timestamp" field
+    sort_order = [("createdAt", -1)]  # Assuming there's an "insertion_timestamp" field
 
     batch_size = 1000
     processed_count = 0
@@ -197,7 +199,7 @@ def scan_unembedded_creations():
 
 while True:
     try:
-        print("hello embedder! 2")
+        print("hello embedder! 3")
         scan_unembedded_creations()
     except Exception as e:
         print(e)
