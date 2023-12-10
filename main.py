@@ -2,7 +2,7 @@ print("new version #4")
 print("e1C 222 aaaa bbb")
 import sys
 sys.path.append('CLIP_assisted_data_labeling')
-print("e2D333 cccc")
+print("e2D333 cccc dddd eeee")
 
 import time
 import os
@@ -49,6 +49,8 @@ try:
         host=CHROMA_HOST, 
         port=8000,
         settings=Settings(
+            allow_reset=True,
+            anonymized_telemetry=False,
             chroma_client_auth_provider="chromadb.auth.basic.BasicAuthClientProvider",
             chroma_client_auth_credentials="chromadb:changeme"
         )
