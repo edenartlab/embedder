@@ -12,6 +12,6 @@ python-dotenv
 scikit-image
 opencv-python
 open_clip_torch
-git+https://github.com/chroma-core/chroma.git
+chromadb==0.4.14
 git+https://github.com/openai/CLIP.git
 
