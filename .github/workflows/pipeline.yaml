@@ -61,6 +61,5 @@ jobs:
           tags:
             ${{ steps.prep.outputs.tagged_image }},${{ steps.prep.outputs.image
             }}:latest
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
-
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
