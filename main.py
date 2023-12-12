@@ -45,8 +45,6 @@ try:
         host=CHROMA_HOST, 
         port=8000,
         settings=Settings(
-            allow_reset=True,
-            anonymized_telemetry=False,
             chroma_client_auth_provider="chromadb.auth.basic.BasicAuthClientProvider",
             chroma_client_auth_credentials="chromadb:changeme"
         )
@@ -102,6 +100,62 @@ except Exception as e:
 aesthetic_regressor = AestheticRegressor(model_path, device)
 
 print(aesthetic_regressor)
+
+
+
+
+def induct_creation(document):
+    uri = document['thumbnail']
+    print("lets go", uri)
+    if not uri:
+        print(f"skip creation {document['_id']}, no thumbnail")
+        return
+    
+    response = requests.get(uri)
+    image = Image.open(BytesIO(response.content)).convert("RGB")
+
+    if not image.mode or not image.size:
+        print(f"skip creation {document['_id']}, invalid image")
+        return
+
+    # aesthetic score
+    score, features = aesthetic_regressor.predict_score(image)
+    embedding = features.squeeze().numpy().tolist()
+    
+    if not embedding:
+        print(f"skip creation {document['_id']}, no embedding")
+        return
+    
+    # check if score is valid (should be >0)
+    if score <= 0:
+        print(f"skip creation {document['_id']}, invalid score={score}")
+        return
+
+    print("SET SCORE", score)
+    # update mongo
+    creations.update_one(
+        {'_id': document['_id']},
+        {
+            '$set': {
+                'embedding': {
+                    # 'embedding': embedding,
+                    'score': score
+                }
+            }
+        }
+    )
+    
+    # # add to chroma
+    # collection.upsert(
+    #     embeddings=[embedding],
+    #     metadatas=[{"user": str(document['user'])}],
+    #     ids=[str(document['_id'])]
+    # )
+
+    print(f"inducted creation {document['_id']}")
+
+
+
 
 def scan_unembedded_creations():
     query = {
