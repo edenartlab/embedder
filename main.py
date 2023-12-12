@@ -53,6 +53,7 @@ try:
     print(chroma_client)
 
     # chroma_client = chromadb.HttpClient(host=CHROMA_HOST, port=8000)
+    print("LETS GET CHROMA COLLECTION!!")
     collection = chroma_client.get_or_create_collection(name="creation_clip_embeddings")
     print(chroma_client.list_collections())
     print(f"Clip embeddings collection size: {collection.count()}")
@@ -145,12 +146,12 @@ def induct_creation(document):
         }
     )
     
-    # # add to chroma
-    # collection.upsert(
-    #     embeddings=[embedding],
-    #     metadatas=[{"user": str(document['user'])}],
-    #     ids=[str(document['_id'])]
-    # )
+    # add to chroma
+    collection.upsert(
+        embeddings=[embedding],
+        metadatas=[{"user": str(document['user'])}],
+        ids=[str(document['_id'])]
+    )
 
     print(f"inducted creation {document['_id']}")
 
