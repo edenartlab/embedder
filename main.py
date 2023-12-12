@@ -1,8 +1,7 @@
-print("new version #6")
-print("e1C 222 aaaa bbb")
+print("new version #7")
+
 import sys
 sys.path.append('CLIP_assisted_data_labeling')
-print("e2D333 cccc dddd eeee")
 
 import time
 import os
@@ -16,37 +15,32 @@ import torch
 import chromadb
 from utils.embedder import AestheticRegressor
 
-print("e3")
 
 IN_DEV = True
 MONGO_URI = os.getenv('MONGO_URI')
 MONGO_DB_NAME = os.getenv('MONGO_DB_NAME')
 CHROMA_HOST = os.getenv('CHROMA_HOST')
-print("HOST IS", CHROMA_HOST)
+print("CHROMA HOST IS", CHROMA_HOST)
 
 
 model_path = "combo_2023-08-02_03:48:00_8.1k_imgs_80_epochs_-1.0000_mse.pth"
 device = "cpu"
 generator_names = ["create", "remix", "blend", "upscale", "real2real", "interpolate", "wav2lip"]
-print("e4")
 
 # setup mongo
 client = MongoClient(MONGO_URI)
 db = client[MONGO_DB_NAME]
 creations = db['creations']
 generators = db['generators']
-print("e5")
+
+
 
 import chromadb
 from chromadb.config import Settings
 
-
-# # setup chroma
-print("try chroma again !!!", CHROMA_HOST)
+# setup chroma
 try:
-
-    print("lets auth now")
-
+    print("try auth chroma", CHROMA_HOST)
     chroma_client = chromadb.HttpClient(
         host=CHROMA_HOST, 
         port=8000,
@@ -107,99 +101,43 @@ except Exception as e:
 # # load scorer + embedder
 aesthetic_regressor = AestheticRegressor(model_path, device)
 
-
-print("AESTH", aesthetic_regressor)
-
-def induct_creation(document):
-    uri = document['thumbnail']
-    print("lets go", uri)
-    if not uri:
-        print(f"skip creation {document['_id']}, no thumbnail")
-        return
-    
-    response = requests.get(uri)
-    image = Image.open(BytesIO(response.content)).convert("RGB")
-
-    if not image.mode or not image.size:
-        print(f"skip creation {document['_id']}, invalid image")
-        return
-
-    # aesthetic score
-    score, features = aesthetic_regressor.predict_score(image)
-    embedding = features.squeeze().numpy().tolist()
-    
-    if not embedding:
-        print(f"skip creation {document['_id']}, no embedding")
-        return
-    
-    # check if score is valid (should be >0)
-    if score <= 0:
-        print(f"skip creation {document['_id']}, invalid score={score}")
-        return
-
-    print("SET SCIOR", score)
-    # update mongo
-    creations.update_one(
-        {'_id': document['_id']},
-        {
-            '$set': {
-                'embedding': {
-                    # 'embedding': embedding,
-                    'score': score
-                }
-            }
-        }
-    )
-    
-    # # add to chroma
-    # collection.upsert(
-    #     embeddings=[embedding],
-    #     metadatas=[{"user": str(document['user'])}],
-    #     ids=[str(document['_id'])]
-    # )
-
-    print(f"inducted creation {document['_id']}")
-
-
-
+print(aesthetic_regressor)
 
 def scan_unembedded_creations():
     query = {
-        "thumbnail": {"$regex": r"\.webp$"},  # Filter for documents where "thumbnail" ends with ".webp"
+        "thumbnail": {"$regex": r"\.webp$"},
+        "embedding.score": {"$exists": False}
     }
     sort_order = [("createdAt", -1)]  # Assuming there's an "insertion_timestamp" field
 
-    batch_size = 1000
+    batch_size = 100
     processed_count = 0
     inductions = 0
 
-    while True:
-        cursor = creations.find(query).sort(sort_order).skip(processed_count).limit(batch_size)
-        
-        batch = list(cursor)
-        if not batch:
-            # No more documents to process
-            print(f"Total number of creations scanned through: {processed_count}, inductions: {inductions}")
+    print(f"scan for last {batch_size} creations")
 
-            break
+    cursor = creations.find(query).sort(sort_order).skip(processed_count).limit(batch_size)
+    
+    batch = list(cursor)
 
-        for doc in batch:
-            try:
-                print(":) _- induct -_ -> ", doc["thumbnail"])
-                induct_creation(doc)
-                inductions += 1
-            except Exception as e:
-                print(f"error for creation {doc['_id']}: {e}")
+    for doc in batch:
+        try:
+            print("induct:", doc["_id"], doc["thumbnail"])
+#            induct_creation(doc)
+            inductions += 1
+        except Exception as e:
+            print(f"error for creation {doc['_id']}: {e}")
 
-        processed_count += len(batch)
-        cursor.close()
+    processed_count += len(batch)
+    cursor.close()
 
-    client.close()
+    print(f"Total number of creations scanned through: {processed_count}, inductions: {inductions}")
+
 
 
 while True:
     try:
-        print("hello embedder! 3")
+        print("Hello embedder!")
         scan_unembedded_creations()
     except Exception as e:
         print(e)
