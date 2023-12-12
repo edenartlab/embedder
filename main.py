@@ -123,7 +123,7 @@ def scan_unembedded_creations():
     for doc in batch:
         try:
             print("induct:", doc["_id"], doc["thumbnail"])
-#            induct_creation(doc)
+            induct_creation(doc)
             inductions += 1
         except Exception as e:
             print(f"error for creation {doc['_id']}: {e}")
