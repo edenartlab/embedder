@@ -17,7 +17,10 @@ RUN apt-get update --fix-missing -y \
 COPY requirements.txt requirements.txt
 RUN --mount=type=cache,target=/root/.cache/pip pip install -r requirements.txt
 
-RUN git clone https://github.com/aiXander/CLIP_assisted_data_labeling
+RUN (git clone https://github.com/aiXander/CLIP_assisted_data_labeling && \
+    cd CLIP_assisted_data_labeling && \
+    git checkout 09468d9)
+
 COPY main.py main.py
 
 #RUN gdown 1Pm2apRxk9CbMspwve3Fir3WwX-vDWXoL
