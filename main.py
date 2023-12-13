@@ -42,6 +42,7 @@ try:
         )
     )
     print(chroma_client)
+    chroma_client.delete_collection(name="creation_clip_embeddings")
     collection = chroma_client.get_or_create_collection(name="creation_clip_embeddings")
     print(chroma_client.list_collections())
     print(f"Clip embeddings collection size: {collection.count()}")
