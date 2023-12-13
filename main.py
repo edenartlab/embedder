@@ -1,4 +1,4 @@
-print("new version #8 ...")
+print("new version #9")
 
 import sys
 sys.path.append('CLIP_assisted_data_labeling')
