@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:1.5
 FROM python:3.10-slim-bookworm as builder
+LABEL org=edenartlab
 WORKDIR /app
 
 
