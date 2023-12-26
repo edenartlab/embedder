@@ -21,8 +21,8 @@ MONGO_DB_NAME = os.getenv('MONGO_DB_NAME')
 CHROMA_HOST = os.getenv('CHROMA_HOST')
 print("CHROMA HOST IS", CHROMA_HOST)
 
-#model_path = "combo_2023-08-02_03:48:00_8.1k_imgs_80_epochs_-1.0000_mse.pth"
-model_path = "eden_scorer_2023-12-13_9.4k_imgs_80_epochs_2_crops.pth"
+model_path = "combo_2023-08-02_03:48:00_8.1k_imgs_80_epochs_-1.0000_mse.pth"
+#model_path = "eden_scorer_2023-12-13_9.4k_imgs_80_epochs_2_crops.pth"
 device = "cpu"
 
 # setup mongo
