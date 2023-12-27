@@ -23,8 +23,8 @@ RUN (git clone https://github.com/aiXander/CLIP_assisted_data_labeling && \
 
 COPY main.py main.py
 
-RUN gdown 1Pm2apRxk9CbMspwve3Fir3WwX-vDWXoL
-#RUN gdown 1iEcUy-fAe2h_3E7gMI4pu8tsZ187n4aC
+# RUN gdown 1Pm2apRxk9CbMspwve3Fir3WwX-vDWXoL
+RUN gdown 1iEcUy-fAe2h_3E7gMI4pu8tsZ187n4aC
 
 EXPOSE 80
 
