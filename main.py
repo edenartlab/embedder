@@ -91,6 +91,8 @@ def induct_creation(document):
         )
 
         print("upsert to id ", str(document['_id']))
+        print(embedding)
+        print("--->")
 
         # update mongo
         creations.update_one(
