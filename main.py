@@ -90,6 +90,8 @@ def induct_creation(document):
             ids=[str(document['_id'])]
         )
 
+        print("upsert to id ", str(document['_id']))
+
         # update mongo
         creations.update_one(
             {'_id': document['_id']},
