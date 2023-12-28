@@ -30,6 +30,7 @@ client = MongoClient(MONGO_URI)
 db = client[MONGO_DB_NAME]
 creations = db['creations']
 generators = db['generators']
+embeddings = db['embeddings']
 
 # setup chroma
 try:
@@ -106,9 +107,20 @@ def induct_creation(document):
                 }
             }
         )
+
+        embeddings.update_one(
+            {'creation': document['_id']},
+            {
+                '$set': {
+                    'embedding': embedding
+                }
+            },
+            upsert=True
+        )
         
         print(f"inducted creation {document['_id']}")
 
+will this create a new document with _
     except Exception as e:
         print(f"error for creation {document['_id']}: {e}")
         return
