@@ -120,7 +120,6 @@ def induct_creation(document):
         
         print(f"inducted creation {document['_id']}")
 
-will this create a new document with _
     except Exception as e:
         print(f"error for creation {document['_id']}: {e}")
         return
