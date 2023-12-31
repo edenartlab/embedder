@@ -1,4 +1,4 @@
-print("new version #9...")
+print("new version #10...")
 
 import sys
 sys.path.append('CLIP_assisted_data_labeling')
@@ -130,17 +130,26 @@ def scan_unembedded_creations():
         "thumbnail": {"$regex": r"\.webp$"},
         "embedding.score": {"$exists": False}
     }
-    sort_order = [("createdAt", -1)]  # Assuming there's an "insertion_timestamp" field
+    sort_order_newest = [("createdAt", -1)]
+    sort_order_oldest = [("createdAt", 1)]
 
-    batch_size = 100
+    batch_size_newest = 30
+    batch_size_oldest = 5
     processed_count = 0
     inductions = 0
 
-    print(f"scan for last {batch_size} creations")
+    print(f"scan for last {batch_size_newest} creations and first {batch_size_oldest} creations")
 
-    cursor = creations.find(query).sort(sort_order).skip(processed_count).limit(batch_size)
-    
-    batch = list(cursor)
+    # Fetch newest documents
+    cursor_newest = creations.find(query).sort(sort_order_newest).limit(batch_size_newest)
+    batch_newest = list(cursor_newest)
+
+    # Fetch oldest documents
+    cursor_oldest = creations.find(query).sort(sort_order_oldest).limit(batch_size_oldest)
+    batch_oldest = list(cursor_oldest)
+
+    # Combine both batches
+    batch = batch_newest + batch_oldest
 
     for doc in batch:
         try:
@@ -151,15 +160,17 @@ def scan_unembedded_creations():
             print(f"error for creation {doc['_id']}: {e}")
 
     processed_count += len(batch)
-    cursor.close()
+    cursor_newest.close()
+    cursor_oldest.close()
 
     print(f"Total number of creations scanned through: {processed_count}, inductions: {inductions}")
 
 
+
 while True:
     try:
-        print("Hello embedder!")
-        scan_unembedded_creations()
+        print("Hello embedder")
+        scan_unembedded_creations()    
     except Exception as e:
-        print(e)
-    time.sleep(5)
+        print(e)    
+    time.sleep(1)
