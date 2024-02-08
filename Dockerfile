@@ -21,6 +21,10 @@ RUN (git clone https://github.com/aiXander/CLIP_assisted_data_labeling && \
     cd CLIP_assisted_data_labeling && \
     git checkout 09468d9)
 
+RUN (git clone https://github.com/edenartlab/creator-lora.git && \
+    cd creator-lora && \
+    git checkout b773492e5fd4845b29ec8e8f12b7cdae71d7bec5)
+
 COPY main.py main.py
 
 # RUN gdown 1Pm2apRxk9CbMspwve3Fir3WwX-vDWXoL
