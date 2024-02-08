@@ -21,10 +21,17 @@ RUN (git clone https://github.com/aiXander/CLIP_assisted_data_labeling && \
     cd CLIP_assisted_data_labeling && \
     git checkout 09468d9)
 
+RUN (git clone https://github.com/edenartlab/creator-lora.git && \
+    cd creator-lora && \
+    git checkout b773492e5fd4845b29ec8e8f12b7cdae71d7bec5)
+
 COPY main.py main.py
 
 # RUN gdown 1Pm2apRxk9CbMspwve3Fir3WwX-vDWXoL
 RUN gdown 1iEcUy-fAe2h_3E7gMI4pu8tsZ187n4aC
+
+# aesthetic_score_best_model.pth
+RUN gdown 1thEIlXVc8lkULVUBY9Ab45tsOERxkjxn
 
 EXPOSE 80
 
