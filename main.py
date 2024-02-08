@@ -2,6 +2,7 @@ print("new version #10...")
 
 import sys
 sys.path.append('CLIP_assisted_data_labeling')
+sys.path.append('creator-lora')
 
 import time
 import os
@@ -15,6 +16,7 @@ import torch
 import chromadb
 from chromadb.config import Settings
 from utils.embedder import AestheticRegressor
+from creator_lora.models.resnet50 import ResNet50MLP
 
 MONGO_URI = os.getenv('MONGO_URI')
 MONGO_DB_NAME = os.getenv('MONGO_DB_NAME')
@@ -23,6 +25,7 @@ print("CHROMA HOST IS", CHROMA_HOST)
 
 # model_path = "combo_2023-08-02_03:48:00_8.1k_imgs_80_epochs_-1.0000_mse.pth"
 model_path = "eden_scorer_2023-12-13_9.4k_imgs_80_epochs_2_crops.pth"
+model_path_resnet50_mlp = "/home/mayukh/repos/creator-lora/checkpoints/aesthetic_score_best_model.pth"
 device = "cpu"
 
 # setup mongo
@@ -53,8 +56,12 @@ except Exception as e:
 
 # load scorer + embedder
 aesthetic_regressor = AestheticRegressor(model_path, device)
+aesthetic_regressor_resnet50 = ResNet50MLP(
+    model_path=model_path_resnet50_mlp,
+    device = device
+)
 print(aesthetic_regressor)
-
+print(aesthetic_regressor_resnet50)
 
 def induct_creation(document):
     uri = document['thumbnail']
@@ -72,7 +79,11 @@ def induct_creation(document):
 
     # aesthetic score
     score, features = aesthetic_regressor.predict_score(image)
+    score_resnet50 = aesthetic_regressor_resnet50.predict_score(image)
     embedding = features.squeeze().numpy().tolist()
+
+    ## take mean score
+    score = (score + score_resnet50) / 2
     
     if not embedding:
         print(f"skip creation {document['_id']}, no embedding")
